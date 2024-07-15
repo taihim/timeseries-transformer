@@ -1,9 +1,9 @@
 from torch.utils.data import Dataset
 import torch
 import numpy as np
+from sklearn.model_selection import StratifiedKFold
 
-
-class FordDatasetKfold(Dataset):
+class FordDataset(Dataset):
     def __init__(self, sequences, labels):
         self.labels = labels
         self.sequences = sequences
@@ -41,19 +41,31 @@ class FordDataset(Dataset):
 
 
 class DatasetManager:
-    def __init__(self, split="train", k_fold=False) -> None:
-        self.split = split
+    def __init__(self, split: str = "train", use_k_fold: bool = False, num_folds: None | int = None) -> None:
         self.root_url = "https://raw.githubusercontent.com/hfawaz/cd-diagram/master/FordA/"
-        if split == "train":
+        self.split = split
+
+        if self.split == "train":
             self.raw_data = torch.tensor(np.loadtxt(self.root_url + "FordA_TRAIN.tsv", delimiter="\t"), dtype=torch.float32)
         else:
             self.raw_data = torch.tensor(np.loadtxt(self.root_url + "FordA_TEST.tsv", delimiter="\t"), dtype=torch.float32)
 
-        if k_fold:
-            self.dataset = FordDatasetKfold()
-        else:
-            self.dataset = FordDataset(split=self.split)
-        self.num_classes = self.dataset.num_classes
+        if use_k_fold:
+            self.use_k_fold = use_k_fold
+            self.num_folds = num_folds
+            self.skf = StratifiedKFold(n_splits=num_folds, shuffle=True, random_state=42)
+
+        self.labels = self.raw_data[:, 0]  # get first element from each example
+        self.sequences = self.raw_data[:, 1:]  # get all elements after first element
+        self.labels[self.labels == -1] = 0  # change all -1 labels to 0
+        self.num_classes = len(torch.unique(self.labels))  # count the number of unique labels
+
 
     def get_dataset(self) -> Dataset | list[Dataset]:
-        return self.dataset
+        if self.use_k_fold:
+            for train_idx, val_idx in self.skf.split(self.sequences, self.labels):
+                # Create PyTorch DataLoader for training and validation
+                train_sets.append(FordDatasetKfold(x[train_idx], y[train_idx]))
+                val_sets.append(FordDatasetKfold(x[val_idx], y[val_idx]))
+            return []
+        return FordDataset(self.sequences, self.labels)
