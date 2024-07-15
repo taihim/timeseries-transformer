@@ -25,14 +25,14 @@ class DatasetBuilder:
     def __init__(self, split: str = "train", use_k_fold: bool = False, num_folds: None | int = None) -> None:
         self.root_url = "https://raw.githubusercontent.com/hfawaz/cd-diagram/master/FordA/"
         self.split = split
+        self.use_k_fold = use_k_fold
 
         if self.split == "train":
             self.raw_data = torch.tensor(np.loadtxt(self.root_url + "FordA_TRAIN.tsv", delimiter="\t"), dtype=torch.float32)
         else:
             self.raw_data = torch.tensor(np.loadtxt(self.root_url + "FordA_TEST.tsv", delimiter="\t"), dtype=torch.float32)
 
-        if use_k_fold:
-            self.use_k_fold = use_k_fold
+        if self.use_k_fold:
             self.num_folds = num_folds
             self.skf = StratifiedKFold(n_splits=num_folds, shuffle=True, random_state=42)
 
