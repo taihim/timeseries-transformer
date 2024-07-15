@@ -2,6 +2,7 @@ from torch.utils.data import Dataset
 import torch
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
+from torch.utils.data import DataLoader
 
 class FordDataset(Dataset):
     """Dataset class for FordA dataset. The dataset is available at: https://archive.ics.uci.edu/ml/datasets/FordA"""
@@ -29,7 +30,6 @@ class DatasetBuilder:
         num_folds (None | int): Number of folds to use for k-fold cross
     """
     def __init__(self, split: str = "train", use_k_fold: bool = False, num_folds: None | int = None) -> None:
-        """"""
         self.root_url = "https://raw.githubusercontent.com/hfawaz/cd-diagram/master/FordA/"
         self.split = split
         self.use_k_fold = use_k_fold
@@ -50,7 +50,7 @@ class DatasetBuilder:
     def get_dataset(self) -> FordDataset | dict[str, list[FordDataset]]:
         """Get dataset for the specified split.
 
-        Returns: FordDataset object or a dictionary of 'num_folds' training/validation FordDataset objects when
+        Returns: FordDataset object or a dictionary of 'num_folds' training and validation FordDataset objects when
         use_k_fold is True.
         """
         if self.use_k_fold:
@@ -62,3 +62,20 @@ class DatasetBuilder:
             return {"train": train_datasets, "val": val_datasets}
 
         return FordDataset(self.sequences, self.labels)
+
+    def create_dataloader(self, batch_size: int = 16, shuffle: bool = False, drop_last: bool = False):
+        """Create DataLoader/s for the specified split.
+
+        Returns: DataLoader object or a tuple containing a training and validation object
+        that are each a list of 'num_folds' DataLoader objects when use_k_fold is True.
+        """
+        dataset = self.get_dataset()
+        if self.use_k_fold:
+            train_dataloaders = []
+            val_dataloaders = []
+            for train_dataset, val_dataset in zip(dataset["train"], dataset["val"]):
+                train_dataloaders.append(DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle))
+                val_dataloaders.append(DataLoader(val_dataset, batch_size=batch_size, shuffle=shuffle))
+            return train_dataloaders, val_dataloaders
+
+        return DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
