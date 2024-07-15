@@ -21,8 +21,15 @@ class FordDataset(Dataset):
 
 
 class DatasetBuilder:
-    """DatasetBuilder for FordA dataset. The dataset is available at: https://archive.ics.uci.edu/ml/datasets/FordA"""
+    """DatasetBuilder for FordDataset.
+
+    Args:
+        split (str): The split of the dataset. Either "train" or "test".
+        use_k_fold (bool): Whether to use k-fold cross-validation.
+        num_folds (None | int): Number of folds to use for k-fold cross
+    """
     def __init__(self, split: str = "train", use_k_fold: bool = False, num_folds: None | int = None) -> None:
+        """"""
         self.root_url = "https://raw.githubusercontent.com/hfawaz/cd-diagram/master/FordA/"
         self.split = split
         self.use_k_fold = use_k_fold
@@ -41,7 +48,11 @@ class DatasetBuilder:
         self.labels[self.labels == -1] = 0  # change all -1 labels to 0
 
     def get_dataset(self) -> FordDataset | dict[str, list[FordDataset]]:
-        """Return FordDataset object or a dictionary of k training/validation FordDataset objects if k-fold is used."""
+        """Get dataset for the specified split.
+
+        Returns: FordDataset object or a dictionary of 'num_folds' training/validation FordDataset objects when
+        use_k_fold is True.
+        """
         if self.use_k_fold:
             train_datasets = []
             val_datasets = []
