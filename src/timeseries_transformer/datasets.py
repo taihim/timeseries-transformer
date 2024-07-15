@@ -4,6 +4,9 @@ import numpy as np
 from sklearn.model_selection import StratifiedKFold
 from torch.utils.data import DataLoader
 
+from src.timeseries_transformer.constants import BATCH_SIZE
+
+
 class FordDataset(Dataset):
     """Dataset class for FordA dataset. The dataset is available at: https://archive.ics.uci.edu/ml/datasets/FordA"""
     def __init__(self, sequences, labels):
@@ -33,7 +36,6 @@ class DatasetBuilder:
         self.root_url = "https://raw.githubusercontent.com/hfawaz/cd-diagram/master/FordA/"
         self.split = split
         self.use_k_fold = use_k_fold
-        self.shape =
 
         if self.split == "train":
             self.raw_data = torch.tensor(np.loadtxt(self.root_url + "FordA_TRAIN.tsv", delimiter="\t"), dtype=torch.float32)
@@ -47,6 +49,10 @@ class DatasetBuilder:
         self.labels = self.raw_data[:, 0]  # get first element from each example
         self.sequences = self.raw_data[:, 1:]  # get all elements after first element
         self.labels[self.labels == -1] = 0  # change all -1 labels to 0
+
+        # TODO: fix this calculation
+        self.shape = (BATCH_SIZE, self.sequences.shape[1], 1)
+
 
     def get_dataset(self) -> FordDataset | dict[str, list[FordDataset]]:
         """Get dataset for the specified split.

@@ -6,6 +6,6 @@ import copy
 
 
 def clone_layers(module, n):
-    "Produce n independent but identical layers."
+    """Produce n independent but identical layers."""
     return nn.ModuleList([copy.deepcopy(module) for _ in range(n)])
 
