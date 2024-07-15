@@ -33,6 +33,7 @@ class DatasetBuilder:
         self.root_url = "https://raw.githubusercontent.com/hfawaz/cd-diagram/master/FordA/"
         self.split = split
         self.use_k_fold = use_k_fold
+        self.shape =
 
         if self.split == "train":
             self.raw_data = torch.tensor(np.loadtxt(self.root_url + "FordA_TRAIN.tsv", delimiter="\t"), dtype=torch.float32)
