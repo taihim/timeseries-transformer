@@ -1,7 +1,22 @@
-import torch.data.Dataset
 from torch.utils.data import Dataset
 import torch
 import numpy as np
+
+
+class FordDatasetKfold(Dataset):
+    def __init__(self, sequences, labels):
+        self.labels = labels
+        self.sequences = sequences
+        self.num_classes = len(torch.unique(self.labels))  # count the number of unique labels
+
+    def __len__(self):
+        return self.sequences.shape[0]
+
+    def __getitem__(self, idx):
+        sequence = torch.reshape(self.sequences[idx], (-1, 1))  # dim: seq_len x num_features
+        label = torch.reshape(self.labels[idx], (-1,))  # dim: 1 x 1
+
+        return sequence, label
 
 
 class FordDataset(Dataset):
@@ -23,3 +38,22 @@ class FordDataset(Dataset):
         label = torch.reshape(self.labels[idx], (-1,))  # dim: 1 x 1
 
         return sequence, label
+
+
+class DatasetManager:
+    def __init__(self, split="train", k_fold=False) -> None:
+        self.split = split
+        self.root_url = "https://raw.githubusercontent.com/hfawaz/cd-diagram/master/FordA/"
+        if split == "train":
+            self.raw_data = torch.tensor(np.loadtxt(self.root_url + "FordA_TRAIN.tsv", delimiter="\t"), dtype=torch.float32)
+        else:
+            self.raw_data = torch.tensor(np.loadtxt(self.root_url + "FordA_TEST.tsv", delimiter="\t"), dtype=torch.float32)
+
+        if k_fold:
+            self.dataset = FordDatasetKfold()
+        else:
+            self.dataset = FordDataset(split=self.split)
+        self.num_classes = self.dataset.num_classes
+
+    def get_dataset(self) -> Dataset | list[Dataset]:
+        return self.dataset
