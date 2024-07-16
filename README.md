@@ -1,5 +1,5 @@
-# Research Project Attention
-This is the repo for the research project on applying attention to timeseries modelling tasks.  
+# Timeseries classification with Transformers
+This is the repo for a time-series classification model based on the transformer architecture.
 
 
 
