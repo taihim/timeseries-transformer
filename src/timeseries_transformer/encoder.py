@@ -2,6 +2,7 @@
 from torch import nn
 from src.timeseries_transformer.attention import MultiHeadAttention
 
+
 class PytorchEncoder(nn.Module):
     def __init__(self, inputs, embed_size, num_heads, ff_dim, dropout=0):
         super(PytorchEncoder, self).__init__()
