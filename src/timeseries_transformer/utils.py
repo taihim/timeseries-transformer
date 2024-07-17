@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, confusion_matrix
 import torch
 from torch import nn, save as torch_save
 import copy
@@ -24,6 +24,8 @@ def evaluate_model(model, data_loader):
     acc = 0
     iteration = 0
     model["model"].eval()
+    all_predictions = []
+    all_correct_labels = []
     for data in data_loader:
         iteration += 1
         inputs, labels = data
@@ -34,10 +36,17 @@ def evaluate_model(model, data_loader):
         outputs = model["model"](inputs)
         predictions = torch.argmax(outputs, dim=1)
         correct_labels = labels.squeeze().int()
+        all_predictions.extend(predictions.cpu())
+        all_correct_labels.extend(correct_labels.cpu())
 
         acc += (predictions == correct_labels).int().sum()/len(labels) * 100
-    x = classification_report(correct_labels, predictions)
-    print(f"Evaluation result for model {model["id"]}: {acc/iteration}")
+
+    print(f"Evaluation accuracy for model {model["id"]}: {acc / iteration}")
+    x = classification_report(all_correct_labels, all_predictions)
+    y = confusion_matrix(all_correct_labels, all_predictions)
+    print(x)
+    print(y)
+
 
 
 def save_model_and_results(
