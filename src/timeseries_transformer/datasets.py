@@ -38,9 +38,15 @@ class DatasetBuilder:
         self.use_k_fold = use_k_fold
 
         if self.split == "train":
-            self.raw_data = torch.tensor(np.loadtxt(self.root_url + "FordA_TRAIN.tsv", delimiter="\t"), dtype=torch.float32)
+            self.raw_data = torch.tensor(
+                                np.loadtxt(self.root_url + "FordA_TRAIN.tsv", delimiter="\t"),
+                                dtype=torch.float32
+                            )
         else:
-            self.raw_data = torch.tensor(np.loadtxt(self.root_url + "FordA_TEST.tsv", delimiter="\t"), dtype=torch.float32)
+            self.raw_data = torch.tensor(
+                                np.loadtxt(self.root_url + "FordA_TEST.tsv", delimiter="\t"),
+                                dtype=torch.float32
+                            )
 
         if self.use_k_fold:
             self.num_folds = num_folds
