@@ -8,17 +8,17 @@ from src.timeseries_transformer.encoder import PytorchEncoder
 
 
 class EncoderClassifier(nn.Module):
-    def __init__(self, inputs, embed_size, num_heads, ff_dim, dropout=0, num_blocks=2):
+    def __init__(self, input_shape, embed_size, num_heads, ff_dim, dropout=0, num_blocks=2):
         super(EncoderClassifier, self).__init__()
 
-        encoder_layer = PytorchEncoder(inputs=inputs, embed_size=embed_size, num_heads=num_heads, ff_dim=ff_dim, dropout=dropout)
+        encoder_layer = PytorchEncoder(input_shape=input_shape, embed_size=embed_size, num_heads=num_heads, ff_dim=ff_dim, dropout=dropout)
         encoders = OrderedDict()
         for idx in range(num_blocks):
             encoders[f"encoder{idx}"] = encoder_layer
 
         self.encoder_block = nn.Sequential(encoders)
         self.avg = nn.AvgPool1d(kernel_size=1)
-        self.dense1 = nn.Linear(500, MLP_UNITS[0])
+        self.dense1 = nn.Linear(input_shape[1], MLP_UNITS[0])
         self.relu1 = nn.ReLU()
         self.dropout1 = nn.Dropout(dropout)
         self.dense2 = nn.Linear(MLP_UNITS[0], 2)
