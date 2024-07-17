@@ -178,7 +178,8 @@ def train(train_dataset_builder: DatasetBuilder):
 
     return model_dict, losses, accuracies, epoch_times
 
-
+#todo: save plots, confusion matrix, classification report, and total_training time. also record
+# time taken for training/validation to converge
 if __name__ == "__main__":
     """Train the timeseries transformer model."""
     if torch.cuda.is_available():
