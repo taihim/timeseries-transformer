@@ -53,7 +53,6 @@ class DatasetBuilder:
         # TODO: fix this calculation
         self.shape = (BATCH_SIZE, self.sequences.shape[1], 1)
 
-
     def get_dataset(self) -> FordDataset | dict[str, list[FordDataset]]:
         """Get dataset for the specified split.
 

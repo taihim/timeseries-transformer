@@ -1,36 +1,40 @@
+"""Timeseries transformer model for classification tasks."""
+from collections import OrderedDict
 import torch.nn as nn
 import torch
-from torch.nn import functional as F
 
-from src.transformer import Block
+from src.timeseries_transformer.constants import MLP_UNITS
+from src.timeseries_transformer.encoder import PytorchEncoder
 
 
-class TimeSeriesTransformerModel(nn.Module):
-    def __init__(self, n_embd, ctx_len, dropout, num_classes):
-        super().__init__()
-        self.input_projection = nn.Linear(1, n_embd)  # Project single feature to embedding dimension
-        self.position_embedding_table = nn.Embedding(ctx_len, n_embd)
-        self.blocks = nn.Sequential(
-            Block(n_embd, n_head=4, mask=False),
-            Block(n_embd, n_head=4, mask=False),
-            Block(n_embd, n_head=4, mask=False),
-            nn.LayerNorm(n_embd),
-        )
-        self.classification_head = nn.Linear(n_embd, num_classes)
+class EncoderClassifier(nn.Module):
+    def __init__(self, inputs, embed_size, num_heads, ff_dim, dropout=0, num_blocks=2):
+        super(EncoderClassifier, self).__init__()
 
-    def forward(self, x, y=None):
-        B, T, D = x.shape  # B is batch size, T is sequence length
+        encoder_layer = PytorchEncoder(inputs=inputs, embed_size=embed_size, num_heads=num_heads, ff_dim=ff_dim, dropout=dropout)
+        encoders = OrderedDict()
+        for idx in range(num_blocks):
+            encoders[f"encoder{idx}"] = encoder_layer
 
-        tok_emb = self.input_projection(x)  # B, T, n_embd tensor
-        pos_emb = self.position_embedding_table(torch.arange(T, device=x.device))  # T, n_embd
-        emb = tok_emb + pos_emb  # B, T, n_embd
-        emb = self.blocks(emb)
-        emb = emb.mean(dim=1)  # Pooling: mean of the sequence (B, n_embd)
-        logits = self.classification_head(emb)  # B, num_classes
+        self.encoder_block = nn.Sequential(encoders)
+        self.avg = nn.AvgPool1d(kernel_size=1)
+        self.dense1 = nn.Linear(500, MLP_UNITS[0])
+        self.relu1 = nn.ReLU()
+        self.dropout1 = nn.Dropout(dropout)
+        self.dense2 = nn.Linear(MLP_UNITS[0], 2)
+        self.softmax = nn.Softmax()
 
-        if y is None:
-            loss = None
-        else:
-            loss = F.cross_entropy(logits, y)  # logits is B, num_classes and y is B
+    def forward(self, x: torch.Tensor):
+        """Perform forward pass of the classifier model.
 
-        return logits, loss
+        Args:
+            x (torch.Tensor): Input tensor of shape (batch_size, seq_len, num_features).
+        """
+        x = self.encoder_block(x)
+        x = torch.squeeze(self.avg(x), 2)
+        x = self.dense1(x)
+        x = self.relu1(x)
+        x = self.dropout1(x)
+        x = self.dense2(x)
+        x = self.softmax(x)
+        return x

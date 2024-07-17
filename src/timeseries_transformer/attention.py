@@ -3,7 +3,6 @@ import math
 import torch
 from torch import nn
 
-from src.timeseries_transformer.constants import NUM_HEADS
 from src.timeseries_transformer.utils import clone_layers
 
 
@@ -13,7 +12,7 @@ class MultiHeadAttention(nn.Module):
         assert head_size % num_heads == 0
 
         self.d_k = head_size // num_heads
-        self.weight_matrices = clone_layers(nn.Linear(head_size, head_size), NUM_HEADS)
+        self.weight_matrices = clone_layers(nn.Linear(head_size, head_size), num_heads)
         self.attn = None
         if dropout > 0:
             self.dropout = nn.Dropout(dropout)
