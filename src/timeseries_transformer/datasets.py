@@ -56,7 +56,6 @@ class DatasetBuilder:
         self.sequences = self.raw_data[:, 1:]  # get all elements after first element
         self.labels[self.labels == -1] = 0  # change all -1 labels to 0
 
-        # TODO: fix this calculation
         self.shape = (BATCH_SIZE, self.sequences.shape[1], 1)
 
     def get_dataset(self) -> FordDataset | dict[str, list[FordDataset]]:
