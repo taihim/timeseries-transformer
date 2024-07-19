@@ -1,3 +1,4 @@
+"""Module containing different attention mechanisms."""
 import math
 
 import torch
