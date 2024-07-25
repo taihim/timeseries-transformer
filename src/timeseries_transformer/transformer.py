@@ -18,6 +18,7 @@ class FeedForward(nn.Module):
     return self.net(x)
 
 class Block(nn.Module):
+  """Block for a transformer model"""
   def __init__(self, n_embd, n_head, mask=False):
     super().__init__()
     head_size = n_embd // n_head
