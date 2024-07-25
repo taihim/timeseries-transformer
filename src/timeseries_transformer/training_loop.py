@@ -1,5 +1,6 @@
 """Training script for the timeseries transformer model."""
 # TODO: reduce code repetition and abstract the training loop into a class
+# Get rid of training loop duplicated code
 from uuid import uuid4
 
 import torch
