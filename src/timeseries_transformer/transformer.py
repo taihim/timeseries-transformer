@@ -4,6 +4,7 @@ from src.vanilla_attention import MultiHeadAttention
 
 
 class FeedForward(nn.Module):
+  """Feedforward block"""
   def __init__(self, n_embd):
     super().__init__()
     self.net = nn.Sequential(
