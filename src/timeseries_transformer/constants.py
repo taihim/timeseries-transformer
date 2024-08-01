@@ -3,7 +3,7 @@ from typing import Final
 from pathlib import Path
 
 # Model parameters
-EMBED_SIZE: Final[int] = 256  # size of the embeddings
+EMBED_SIZE: Final[int] = 256  # dimension of the embedding layer
 NUM_ATTN_HEADS: Final[int] = 4  # number of attention heads
 ENCODER_FF_DIM: Final[int] = 4  # dimension of the feedforward layer in the encoder
 NUM_ENCODER_BLOCKS: Final[int] = 2  # number of encoder blocks
