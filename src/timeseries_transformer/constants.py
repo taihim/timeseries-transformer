@@ -18,7 +18,7 @@ LEARNING_RATE: Final[float] = 1e-3  # learning rate
 SEED: Final[int] = 42  # seed for reproducibility
 USE_K_FOLD: Final[bool] = False  # whether to use k-fold cross-validation
 NUM_FOLDS: Final[int] = 2  # number of folds for cross-validation
-SHUFFLE: Final[bool] = True  # whether to shuffle the dataset
+SHUFFLE: Final[bool] = True  # whether to shuffle the dataset when training
 TEST_DATA_SAMPLES: Final[float] = 1  # number of examples in the test set
 
 # Post training parameters
