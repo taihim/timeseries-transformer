@@ -9,7 +9,7 @@ ENCODER_FF_DIM: Final[int] = 4  # dimension of the feedforward layer in the enco
 NUM_ENCODER_BLOCKS: Final[int] = 2  # number of encoder blocks
 MLP_UNITS: Final[list[int]] = [128]  # the size of the feedforward layer used to make predictions
 MLP_DROPOUT: Final[float] = 0.4  # dropout in the feedforward layer
-DROPOUT: Final[float] = 0.25  # dropout in the encoder
+DROPOUT: Final[float] = 0.25  # dropout in the encoder layer
 
 # Training parameters
 BATCH_SIZE: Final[int] = 64  # batch size
