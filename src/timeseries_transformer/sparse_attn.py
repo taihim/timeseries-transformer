@@ -1,1 +1,1 @@
-
+"""Sparse attention module"""
