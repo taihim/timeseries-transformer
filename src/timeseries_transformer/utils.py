@@ -42,10 +42,11 @@ def evaluate_model(model, data_loader):
         acc += (predictions == correct_labels).int().sum()/len(labels) * 100
 
     print(f"Evaluation accuracy for model {model["id"]}: {acc / iteration}")
-    x = classification_report(all_correct_labels, all_predictions)
-    y = confusion_matrix(all_correct_labels, all_predictions)
-    print(x)
-    print(y)
+    report = classification_report(all_correct_labels, all_predictions)
+    conf_matrix = confusion_matrix(all_correct_labels, all_predictions)
+    # TODO: save these (report, conf_matrix, acc/iteration (as test set accuracy)) to disk (maybe as csv or json?)
+    print(report)
+    print(conf_matrix)
 
 
 
