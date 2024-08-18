@@ -1,1 +1,1 @@
-# linear attention implementation
+# linear attention implementation. from the linformer paper
