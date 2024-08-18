@@ -158,6 +158,7 @@ def train(train_dataset_builder: DatasetBuilder):
     model.cuda()
     criterion = CrossEntropyLoss()
     optimizer = Adam(model.parameters(), lr=LEARNING_RATE)
+    print(sum(p.numel() for p in model.parameters()))
     model_dict = {"id": str(uuid4())[0:8], "model": model, "loss_fn": criterion, "opt": optimizer}
 
     for epoch in range(EPOCHS):
@@ -200,7 +201,7 @@ if __name__ == "__main__":
                                 epoch_times=epoch_times[fold], eval_results=eval_results
                                )
     else:
-        model, losses, accuracies, epoch_times= train(train_db)
+        model, losses, accuracies, epoch_times = train(train_db)
         eval_results = evaluate_model(model, test_dataloader)
         save_model_and_results(
             model=model, losses=losses, accuracies=accuracies,

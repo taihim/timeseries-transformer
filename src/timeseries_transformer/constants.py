@@ -12,8 +12,8 @@ MLP_DROPOUT: Final[float] = 0.4  # dropout in the feedforward layer
 DROPOUT: Final[float] = 0.25  # dropout in the encoder layer
 
 # Training parameters
-BATCH_SIZE: Final[int] = 64  # batch size
-EPOCHS: Final[int] = 2  # number of epochs
+BATCH_SIZE: Final[int] = 256  # batch size
+EPOCHS: Final[int] = 10  # number of epochs
 LEARNING_RATE: Final[float] = 1e-3  # learning rate
 SEED: Final[int] = 42  # seed for reproducibility
 USE_K_FOLD: Final[bool] = False  # whether to use k-fold cross-validation

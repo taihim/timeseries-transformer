@@ -1,5 +1,6 @@
 """Utility functions for the timeseries_transformer module."""
 import os
+import time
 from pathlib import Path
 from typing import Any
 
@@ -26,20 +27,25 @@ def evaluate_model(model, data_loader):
     model["model"].eval()
     all_predictions = []
     all_correct_labels = []
+    inference_time = []
     for data in data_loader:
         iteration += 1
         inputs, labels = data
         if torch.cuda.is_available():
             inputs = inputs.cuda()
             labels = labels.cuda()
-
+        start = time.time()
         outputs = model["model"](inputs)
+        end = time.time()
+        inference_time.append(end - start)
         predictions = torch.argmax(outputs, dim=1)
         correct_labels = labels.squeeze().int()
         all_predictions.extend(predictions.cpu())
         all_correct_labels.extend(correct_labels.cpu())
 
         acc += (predictions == correct_labels).int().sum()/len(labels) * 100
+
+    print(f"Time taken for inference: {np.mean(inference_time)}")
 
     print(f"Evaluation accuracy for model {model["id"]}: {acc / iteration}")
     report = classification_report(all_correct_labels, all_predictions)
