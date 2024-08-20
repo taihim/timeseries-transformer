@@ -77,3 +77,5 @@ dmypy.json
 .pytype/
 
 evaluation_results/
+
+datasets/classification/FaultDetectionA*
