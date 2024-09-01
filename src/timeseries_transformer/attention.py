@@ -7,6 +7,36 @@ from torch import nn
 from src.timeseries_transformer.utils import clone_layers
 
 
+class ScaledDPAttention(nn.Module):
+    def __init__(self, head_size, dropout=0.1):
+        super(ScaledDPAttention, self).__init__()
+        self.d_k = head_size
+        self.proj = nn.Linear(head_size, head_size * 3)  # Combined projection for Q, K, V
+        self.attn = None
+        if dropout > 0:
+            self.dropout = nn.Dropout(dropout)
+
+    def _attention(self, query, key, value, mask=None):
+        scores = torch.matmul(query, key.transpose(-2, -1)) / math.sqrt(self.d_k)
+        if mask is not None:
+            scores = scores.masked_fill(mask == 0, -1e9)
+        p_attn = scores.softmax(dim=-1)
+        if hasattr(self, 'dropout'):
+            p_attn = self.dropout(p_attn)
+        return torch.matmul(p_attn, value), p_attn
+
+    def forward(self, x, mask=None):
+        """Perform forward pass of SingleAttention module."""
+        # Combined projection for Q, K, V
+        qkv = self.proj(x).chunk(3, dim=-1)
+        query, key, value = qkv
+
+        # Calculate attention
+        x, self.attn = self._attention(query, key, value, mask)
+
+        return x
+
+
 class MultiHeadAttention(nn.Module):
     def __init__(self, head_size, num_heads, dropout=0.1):
         super(MultiHeadAttention, self).__init__()

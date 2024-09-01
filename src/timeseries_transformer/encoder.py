@@ -1,6 +1,7 @@
 """Encoder module for the timeseries transformer model."""
 from torch import nn
-from src.timeseries_transformer.attention import MultiHeadAttention, WindowedAttention, LinearAttention
+from src.timeseries_transformer.attention import MultiHeadAttention, WindowedAttention, LinearAttention, \
+    ScaledDPAttention
 
 
 class PytorchEncoder(nn.Module):
@@ -8,8 +9,9 @@ class PytorchEncoder(nn.Module):
         super(PytorchEncoder, self).__init__()
         # attention
         self.embedding = nn.Linear(in_features=input_shape[-1], out_features=embed_size)
-        self.attention = LinearAttention(embed_size, num_heads, dropout=0.0, seq_len=5120, low_rank_dim=32)
+        # self.attention = ScaledDPAttention(embed_size)
         # self.attention = MultiHeadAttention(embed_size, num_heads, dropout=0.0)
+        # self.attention = LinearAttention(embed_size, num_heads, dropout=0.0, seq_len=500, low_rank_dim=64)
         self.linear1 = nn.Linear(embed_size, 1)
         self.dropout1 = nn.Dropout(dropout)
         self.layer_norm1 = nn.LayerNorm(normalized_shape=input_shape[-1], eps=1e-6)
@@ -24,7 +26,8 @@ class PytorchEncoder(nn.Module):
     def forward(self, src):
         """Perform forward pass of the encoder module."""
         x = self.embedding(src)
-        x = self.attention(x, x, x)[0]
+        # x = self.attention(x, x, x)[0]
+        # x = self.attention(x)
         x = self.linear1(x)
         x = self.dropout1(x)
         x = self.layer_norm1(x)
